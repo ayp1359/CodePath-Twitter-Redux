@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SignInViewController">
+            <connections>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h18-AW-ej4">
+                    <rect key="frame" x="92" y="229" width="136" height="110"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="110" id="MRr-DC-85Y"/>
+                        <constraint firstAttribute="width" constant="136" id="w0s-5Q-XAY"/>
+                    </constraints>
+                    <state key="normal" image="Twitter_logo_blue">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="signIn:" destination="-1" eventType="touchUpInside" id="1mT-yF-udc"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="sign in" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Lj-KY-mcp">
+                    <rect key="frame" x="123" y="339" width="75" height="33"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="75" id="t9T-GQ-WJP"/>
+                        <constraint firstAttribute="height" constant="33" id="xP2-x9-idE"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="HelveticaNeue-Thin" family="Helvetica Neue" pointSize="18"/>
+                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="7Lj-KY-mcp" firstAttribute="top" secondItem="h18-AW-ej4" secondAttribute="bottom" id="HXd-ex-QbQ"/>
+                <constraint firstAttribute="centerX" secondItem="h18-AW-ej4" secondAttribute="centerX" id="PnS-ts-6OI"/>
+                <constraint firstItem="7Lj-KY-mcp" firstAttribute="centerX" secondItem="h18-AW-ej4" secondAttribute="centerX" constant="0.5" id="fLR-vH-P9A"/>
+                <constraint firstAttribute="centerY" secondItem="h18-AW-ej4" secondAttribute="centerY" id="gMN-y3-CPR"/>
+            </constraints>
+        </view>
+    </objects>
+    <resources>
+        <image name="Twitter_logo_blue" width="1139" height="926"/>
+    </resources>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4"/>
+    </simulatedMetricsContainer>
+</document>
