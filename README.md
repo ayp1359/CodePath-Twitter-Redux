@@ -1,6 +1,6 @@
 CodePath-Twitter-Redux
 ================
-This is a basic twitter app (redux) to read and compose tweets the [Twitter API](https://apps.twitter.com/).
+This is a basic twitter app (redux) to read and compose tweets using the [Twitter API](https://apps.twitter.com/).
 
 Time spent: 10 hours
 
