@@ -36,6 +36,7 @@ Time spent: 10 hours
 
 Credits
 ---------
+* Inspired by many other Hamburger Menus on GitHub!
 * GIF created with [LiceCap](http://www.cockos.com/licecap/)
 * [AFNetworking](https://github.com/AFNetworking/AFNetworking)
 * [BDBOAuth1Manager](https://github.com/bdbergeron/BDBOAuth1Manager)
