@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "TweetCell.h"
+#import "ComposeTweetViewController.h"
 
 @protocol TweetTableViewDelegate <NSObject>
 - (UINavigationController*) navigationController;
@@ -15,7 +16,7 @@
 @end
 
 
-@interface TweetTableViewController : UIViewController<UITableViewDataSource,UITableViewDelegate, TweetCellDelegate>
+@interface TweetTableViewController : UIViewController<UITableViewDataSource,UITableViewDelegate, TweetCellDelegate,ComposeTweetDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) id<TweetTableViewDelegate> delegate;
 @end

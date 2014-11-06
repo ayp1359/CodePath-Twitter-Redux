@@ -8,8 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString * const CurrentUserSetNotification;
-extern NSString * const CurrentUserRemovedNotification;
+extern NSString * const kCurrentUserSetNotification;
+extern NSString * const kCurrentUserRemovedNotification;
 
 @interface User : NSObject<NSCoding>
 @property (nonatomic, assign) NSInteger userId;

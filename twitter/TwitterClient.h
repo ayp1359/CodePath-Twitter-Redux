@@ -15,6 +15,8 @@ extern NSString * const kTwitterClientCallbackNotification;
 extern NSString * const kTwitterClientCallbackURLKey;
 
 + (TwitterClient *)instance;
+- (void)retweet:(Tweet*)tweet success:(void (^)(Tweet* tweet))success failure:(void (^)(NSError *error))failure;
+- (void)unRetweet:(Tweet*) tweet success:(void (^)())success failure:(void (^)(NSError *))failure;
 - (void)loginWithSuccess:(void (^)())success failure:(void (^)(NSError* error))failure;
 - (void)currentUserWithSuccess:(void (^)(User* currentUser))success failure:(void (^)(NSError *error))failure;
 - (void)userTimeLine:(User *) user success:(void (^)(NSArray *))success failure:(void (^)(NSError *))failure;
@@ -22,6 +24,4 @@ extern NSString * const kTwitterClientCallbackURLKey;
 - (void)mentionsTimelineWithSuccess:(void (^)(NSArray *))success failure:(void (^)(NSError *))failure;
 - (void)postTweetWithText:(NSString*)text replyToTweetId:(NSNumber*)replyToId success:(void (^)(Tweet* tweet))success failure:(void (^)(NSError *error))failure;
 - (void)toggleFavoriteForTweet:(Tweet *)tweet success:(void (^)(Tweet *))success failure:(void (^)(NSError *))failure;
-- (void)retweet:(Tweet*)tweet success:(void (^)(Tweet* tweet))success failure:(void (^)(NSError *error))failure;
-- (void)unRetweet:(Tweet*) tweet success:(void (^)())success failure:(void (^)(NSError *))failure;
 @end

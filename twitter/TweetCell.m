@@ -27,25 +27,17 @@
 
 @implementation TweetCell
 
-- (void)awakeFromNib
-{
-
-}
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
-{
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
   [super setSelected:selected animated:animated];
 }
 
 
-- (void)setTweet:(Tweet *)tweet
-{
+- (void)setTweet:(Tweet *)tweet {
   _tweet = tweet;
   [self refreshView];
 }
 
-- (void) refreshView
-{
+- (void) refreshView {
   Tweet* tweet = self.tweet;
   if (tweet.retweetedByUser)
   {
@@ -79,8 +71,8 @@
   }
 }
 
-- (CGFloat) estimateHeight:(Tweet *)tweet
-{
+- (CGFloat) estimateHeight:(Tweet *)tweet {
+  //some manual autolayout stuff here
   CGFloat h = 0.0f;
   h += 13;
   

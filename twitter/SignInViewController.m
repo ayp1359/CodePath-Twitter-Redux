@@ -4,31 +4,23 @@
 #import "TwitterClient.h"
 
 @interface SignInViewController ()
-
 @end
 
 @implementation SignInViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
   }
   return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
   [super viewDidLoad];
 }
 
-- (void)didReceiveMemoryWarning
-{
-  [super didReceiveMemoryWarning];
-}
 
-- (IBAction)signIn:(id)sender
-{
+- (IBAction)signIn:(id)sender {
   [[TwitterClient instance]
    loginWithSuccess:^{
      [self fetchAndSaveCurrentUser];
@@ -38,8 +30,7 @@
    }];
 }
 
-- (void) fetchAndSaveCurrentUser
-{
+- (void)fetchAndSaveCurrentUser {
   [MBProgressHUD showHUDAddedTo:self.view animated:YES];
   [[TwitterClient instance] currentUserWithSuccess:^(User *currentUser) {
     [User setCurrentUser:currentUser];
@@ -50,9 +41,13 @@
   }];
 }
 
-- (void) errorDuringSignIn:(NSError *)error
-{
+- (void)errorDuringSignIn:(NSError *)error {
   UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not signin." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
   [alertView show];
 }
+
+- (void)didReceiveMemoryWarning {
+  [super didReceiveMemoryWarning];
+}
+
 @end

@@ -3,7 +3,7 @@
 //  twitter
 //
 //  Created by Ali YAZDAN PANAH on 11/05/14.
-//  Copyright (c) 2014 codepath. All rights reserved.
+//  Copyright (c) 2014 Ali YAZDAN PANAH. All rights reserved.
 //
 
 #import "ComposeTweetViewController.h"
@@ -11,9 +11,9 @@
 #import <MBProgressHUD.h>
 #import "TwitterClient.h"
 
-
-NSString * const NewTweetPostedNotification = @"com.codepath.twitter.new_tweet";
-NSString * const NewTweetPostedNotificationKey = @"com.codepath.twitter.new_tweet.key";
+//set notification constant keys
+NSString * const kNewTweetPostedNotification = @"twitter.new_tweet";
+NSString * const kNewTweetPostedNotificationKey = @"twitter.new_tweet.key";
 
 @interface ComposeTweetViewController ()
 @property (weak, nonatomic) IBOutlet UITextView *tweetTextView;
@@ -26,8 +26,7 @@ NSString * const NewTweetPostedNotificationKey = @"com.codepath.twitter.new_twee
 
 @implementation ComposeTweetViewController
 
-- (id)initWithTweetText:(NSString *)tweetText replyToTweetId:(NSNumber*)replyToTweetId
-{
+- (id)initWithTweetText:(NSString *)tweetText replyToTweetId:(NSNumber*)replyToTweetId {
   self = [super init];
   if (self) {
     self.initialText = tweetText;
@@ -36,8 +35,7 @@ NSString * const NewTweetPostedNotificationKey = @"com.codepath.twitter.new_twee
   return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
   [super viewDidLoad];
   
   self.tweetTextView.text = self.initialText;
@@ -64,15 +62,14 @@ NSString * const NewTweetPostedNotificationKey = @"com.codepath.twitter.new_twee
 
 
 - (void)textViewDidChange:(UITextView *)textView {
-  self.limitLabel.text = [NSString stringWithFormat:@"%ld", 140 - self.tweetTextView.text.length];
+  self.limitLabel.text = [NSString stringWithFormat:@"%lu", 140 - self.tweetTextView.text.length];
 }
 
-- (void) sendTweet
-{
+- (void)sendTweet {
   NSString* text = self.tweetTextView.text;
   [MBProgressHUD showHUDAddedTo:self.view animated:YES];
   [[TwitterClient instance] postTweetWithText:text replyToTweetId:self.replyToTweetId success:^(Tweet *tweet) {
-    [[NSNotificationCenter defaultCenter] postNotificationName:NewTweetPostedNotification object:self userInfo:@{NewTweetPostedNotificationKey: tweet}];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kNewTweetPostedNotification object:self userInfo:@{kNewTweetPostedNotificationKey: tweet}];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     [self.delegate sendTweet:tweet];
   } failure:^(NSError *error) {
@@ -81,7 +78,7 @@ NSString * const NewTweetPostedNotificationKey = @"com.codepath.twitter.new_twee
   
 }
 
-- (void) cancelTweet {
+- (void)cancelTweet {
   [self.delegate cancelNewTweet];
 }
 

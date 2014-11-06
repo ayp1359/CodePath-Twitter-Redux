@@ -8,15 +8,14 @@
 
 #import "User.h"
 
-static NSString * const CurrentUserKey = @"com.codepath.twitter.current_user";
-NSString * const CurrentUserSetNotification = @"com.codepath.twitter.notification.current_user.set";
-NSString * const CurrentUserRemovedNotification = @"com.codepath.twitter.notification.current_user.removed";
+static NSString * const kCurrentUserKey = @"twitter.current_user";
+NSString * const kCurrentUserSetNotification = @"twitter.notification.current_user.set";
+NSString * const kCurrentUserRemovedNotification = @"twitter.notification.current_user.removed";
 
 @implementation User
 static User* _currentUser = nil;
 
-- (instancetype) initWithDictionary:(NSDictionary*) dict
-{
+- (instancetype) initWithDictionary:(NSDictionary*) dict {
   self = [super init];
   if (self) {
     self.userId = [dict[@"id"] integerValue];
@@ -39,8 +38,7 @@ static User* _currentUser = nil;
 
 
 
-- (id)initWithCoder:(NSCoder *)decoder
-{
+- (id)initWithCoder:(NSCoder *)decoder {
   self = [super init];
   if (self) {
     self.userId = [decoder decodeIntegerForKey:@"userId"];
@@ -56,34 +54,31 @@ static User* _currentUser = nil;
 }
 
 
-+ (void) setCurrentUser:(User *)user
-{
++ (void) setCurrentUser:(User *)user {
   if (!_currentUser && user) {
     _currentUser = user;
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     NSData* data = [NSKeyedArchiver archivedDataWithRootObject:user];
-    [userDefaults setObject:data forKey:CurrentUserKey];
+    [userDefaults setObject:data forKey:kCurrentUserKey];
     [userDefaults synchronize];
-    [[NSNotificationCenter defaultCenter] postNotificationName:CurrentUserSetNotification object:user];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kCurrentUserSetNotification object:user];
   } else {
     [self removeCurrentUser];
   }
 }
 
-+ (void) removeCurrentUser
-{
++ (void) removeCurrentUser {
   _currentUser = nil;
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-  [userDefaults removeObjectForKey:CurrentUserKey];
+  [userDefaults removeObjectForKey:kCurrentUserKey];
   [userDefaults synchronize];
-  [[NSNotificationCenter defaultCenter] postNotificationName:CurrentUserRemovedNotification object:nil];
+  [[NSNotificationCenter defaultCenter] postNotificationName:kCurrentUserRemovedNotification object:nil];
 }
 
-+ (User *)currentUser
-{
++ (User *)currentUser {
   if (!_currentUser) {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSData *data = [userDefaults objectForKey:CurrentUserKey];
+    NSData *data = [userDefaults objectForKey:kCurrentUserKey];
     if (data) {
       User* currentUser = [NSKeyedUnarchiver unarchiveObjectWithData:data];
       _currentUser = currentUser;
@@ -92,8 +87,7 @@ static User* _currentUser = nil;
   return _currentUser;
 }
 
-- (void)encodeWithCoder:(NSCoder *)encoder
-{
+- (void)encodeWithCoder:(NSCoder *)encoder {
   [encoder encodeInteger:self.userId forKey:@"userId"];
   [encoder encodeObject:self.name forKey:@"name"];
   [encoder encodeObject:self.screenName forKey:@"screenName"];

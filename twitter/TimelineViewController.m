@@ -10,7 +10,7 @@
 #import "TwitterClient.h"
 #import "TweetCell.h"
 #import <MBProgressHUD.h>
-
+#import "HBMenuController.h"
 
 @interface TimelineViewController ()
 @property (strong, nonatomic) UIRefreshControl* refreshControl;
@@ -19,10 +19,11 @@
 @property (copy, nonatomic) void (^dataLoadingBlockWithSuccessFailure)(void (^success)(NSArray *), void (^failure)(NSError *));
 @end
 
+extern HBMenuController* menuController;
+
 @implementation TimelineViewController
 
-- (id) initWithDataLoadingBlockWithSuccessFailure:(void (^)(void (^success)(NSArray *), void (^failure)(NSError *))) block;
-{
+- (id) initWithDataLoadingBlockWithSuccessFailure:(void (^)(void (^success)(NSArray *), void (^failure)(NSError *))) block; {
   self = [super init];
   if (self) {
     self.tableViewController = [[TweetTableViewController alloc] init];
@@ -35,26 +36,24 @@
   return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
   [super viewDidLoad];
-  
-  [self.tableOutlet addSubview:self.tableViewController.view];
   
   UITableViewController *tableViewController = [[UITableViewController alloc] init];
   tableViewController.tableView = self.tableViewController.tableView;
   self.refreshControl = [[UIRefreshControl alloc] init];
   [self.refreshControl addTarget:self action:@selector(refetchTweetsViaRefreshControl) forControlEvents:UIControlEventValueChanged];
   tableViewController.refreshControl = self.refreshControl;
-  self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Sign Out" style:UIBarButtonItemStylePlain target:self action:@selector(SignOut)];
-  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"New Tweet" style:UIBarButtonItemStylePlain target:self action:@selector(composeNewTweet)];
-  self.title = @"home";
+  [self.tableOutlet addSubview:self.tableViewController.view];
   
+  self.navigationItem.leftBarButtonItem.enabled = NO;
+  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"tweet_image.png"] style:UIBarButtonItemStylePlain target:self action:@selector(composeNewTweet)];
+  
+  self.title = @"home";
   
 }
 
-- (void) composeNewTweet
-{
+- (void) composeNewTweet {
   ComposeTweetViewController *composeViewController = [[ComposeTweetViewController alloc] initWithTweetText:@"" replyToTweetId:nil];
   composeViewController.delegate = self;
   UINavigationController *wrapperNavController = [[UINavigationController alloc] initWithRootViewController:composeViewController];
@@ -62,32 +61,22 @@
 }
 
 
-- (void) viewWillAppear:(BOOL)animated
-{
+- (void) viewWillAppear:(BOOL)animated {
   self.navigationController.navigationBarHidden=NO;
   [super viewWillAppear:animated];
   [self.tableViewController.tableView reloadData];
   
 }
 
-- (void)SignOut{
+- (void)SignOut {
   [User removeCurrentUser];
 }
 
-- (void) networkError:(NSError *)error
-{
-  UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Can not connect to Twitter." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-  [alertView show];
-}
-
-
-- (void) setTweets:(NSArray *)tweets
-{
+- (void) setTweets:(NSArray *)tweets {
   _tweets = [tweets mutableCopy];
 }
 
-- (void) refetchTweetsAndShowProgressHUD
-{
+- (void) refetchTweetsAndShowProgressHUD {
   [MBProgressHUD showHUDAddedTo:self.view animated:YES];
   self.dataLoadingBlockWithSuccessFailure(^(NSArray *tweets) {
     self.tweets = [tweets mutableCopy];
@@ -95,34 +84,27 @@
     [MBProgressHUD hideHUDForView:self.view animated:YES];
   }, ^(NSError *error) {
     [MBProgressHUD hideHUDForView:self.view animated:YES];
-    [self networkError:error];
   });
 }
 
-- (void) refetchTweetsViaRefreshControl
-{
+- (void) refetchTweetsViaRefreshControl {
   self.dataLoadingBlockWithSuccessFailure(^(NSArray *tweets) {
     self.tweets = [tweets mutableCopy];
     [self.tableViewController.tableView reloadData];
     [self.refreshControl endRefreshing];
   }, ^(NSError *error) {
     [self.refreshControl endRefreshing];
-    [self networkError:error];
   });
 }
 
-- (void) newTweet
-{
-  
+- (void)newTweet {
 }
 
-- (void) sendTweet:(Tweet *)tweet
-{
+- (void)sendTweet:(Tweet *)tweet {
   [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void) cancelNewTweet
-{
+- (void)cancelNewTweet {
   [self dismissViewControllerAnimated:YES completion:nil];
 }
 

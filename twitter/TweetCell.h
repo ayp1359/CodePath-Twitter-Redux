@@ -10,7 +10,6 @@
 #import "Tweet.h"
 
 @protocol TweetCellDelegate <NSObject>
-
 @end
 
 @interface TweetCell : UITableViewCell

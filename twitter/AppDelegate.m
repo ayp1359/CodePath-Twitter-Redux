@@ -13,11 +13,16 @@
 #import "Tweet.h"
 #import "TimelineViewController.h"
 #import "ComposeTweetViewController.h"
+#import "ProfileViewController.h"
 
 @interface AppDelegate ()
+@property (nonatomic, strong) NSArray* viewControllersInMenu;
 @property (nonatomic, strong) UIViewController* signInViewController;
-@property (nonatomic, strong) UIViewController* MainViewController;
-@property (nonatomic, strong) UIViewController* homeViewController;
+@property (nonatomic, strong) UIViewController* timelineViewController;
+@property (nonatomic, strong) ProfileViewController* myProfileViewController;
+@property (nonatomic, strong) HBMenuController* menuController;
+@property (nonatomic, strong) UITableViewCell* extraCell;
+@property (nonatomic, strong) UITableViewCell* signOutButton;
 @end
 
 @implementation AppDelegate
@@ -25,18 +30,24 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   
-  [self registerUserNotifications];
+  [self setupNotifications];
+  
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   self.signInViewController = [[SignInViewController alloc] init];
   
+  //populate and setup HBMenuController
+  self.viewControllersInMenu = @[self.timelineViewController, [[UINavigationController alloc] initWithRootViewController:self.myProfileViewController]];
+  
+  self.menuController = [[HBMenuController alloc] init];
+  self.menuController.delegate = self;
+  //check to see if user is logged in
   User *user  = [User currentUser];
   if(user) {
-    self.window.rootViewController = self.homeViewController;
+    self.window.rootViewController = self.menuController;
   }
   else {
     self.window.rootViewController = self.signInViewController;
   }
-  
   
   self.window.backgroundColor = [UIColor whiteColor];
   [self.window makeKeyAndVisible];
@@ -44,14 +55,17 @@
   return YES;
 }
 
+- (NSInteger)numberOfItemsInMenu:(HBMenuController *)HBMenuController {
+  return self.viewControllersInMenu.count + 2;
+}
 
-- (void) registerUserNotifications
-{
-  [[NSNotificationCenter defaultCenter] addObserverForName:CurrentUserSetNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notification) {
-    self.window.rootViewController = self.homeViewController;
+
+- (void)setupNotifications {
+  [[NSNotificationCenter defaultCenter] addObserverForName:kCurrentUserSetNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notification) {
+    self.window.rootViewController = self.timelineViewController;
   }];
   
-  [[NSNotificationCenter defaultCenter] addObserverForName:CurrentUserRemovedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notification) {
+  [[NSNotificationCenter defaultCenter] addObserverForName:kCurrentUserRemovedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notification) {
     self.window.rootViewController = self.signInViewController ;
   }];
 }
@@ -86,23 +100,87 @@
   return YES;
 }
 
-- (UIViewController *)homeViewController
-{
-  if (!_homeViewController) {
-    TimelineViewController*  homeViewController = [[TimelineViewController alloc] initWithDataLoadingBlockWithSuccessFailure:^(void (^success)(NSArray *), void (^failure)(NSError *)) {
+- (UIViewController *)timelineViewController {
+  if (!_timelineViewController) {
+    TimelineViewController*  timelineViewController = [[TimelineViewController alloc] initWithDataLoadingBlockWithSuccessFailure:^(void (^success)(NSArray *), void (^failure)(NSError *)) {
       [[TwitterClient instance] homeTimelineWithSuccess:success failure:failure];
     }];
-    homeViewController.title = @"Home";
-    [[NSNotificationCenter defaultCenter] addObserverForName:NewTweetPostedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notification) {
-      Tweet* tweet = notification.userInfo[NewTweetPostedNotificationKey];
-      [homeViewController.tweets insertObject:tweet atIndex:0];
+    timelineViewController.title = @"Home";
+    [[NSNotificationCenter defaultCenter] addObserverForName:kNewTweetPostedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notification) {
+      Tweet* tweet = notification.userInfo[kNewTweetPostedNotificationKey];
+      [timelineViewController.tweets insertObject:tweet atIndex:0];
     }];
-    _homeViewController = [[UINavigationController alloc] initWithRootViewController:homeViewController];
+    _timelineViewController = [[UINavigationController alloc] initWithRootViewController:timelineViewController];
   }
   
-  return _homeViewController;
+  return _timelineViewController;
 }
 
+- (UIViewController *)myProfileViewController {
+  if (!_myProfileViewController) {
+    ProfileViewController *myProfileViewController = [[ProfileViewController alloc] initWithUser:[User currentUser]];
+    myProfileViewController.title = @"Me";
+    myProfileViewController.shouldShowMenuButton = NO;
+    _myProfileViewController = myProfileViewController;
+  }
+  
+  return _myProfileViewController;
+}
 
+- (UIViewController *)viewControllerAtIndex:(NSInteger)index HBMenuController:(HBMenuController *)HBMenuController {
+  if (index < self.viewControllersInMenu.count) {
+    return self.viewControllersInMenu[index];
+  }
+  
+  return nil;
+}
+
+- (UITableViewCell *)cellForMenuItemAtIndex:(NSInteger)index HBMenuController:(HBMenuController *)HBMenuController {
+  if (index == self.viewControllersInMenu.count) {
+    return self.extraCell;
+  } else if (index == self.viewControllersInMenu.count + 1) {
+    return self.signOutButton;
+  }
+  return nil;
+}
+
+- (void) signOut
+{
+  [self.menuController closeHBMenuWithDuration:0];
+  [User removeCurrentUser];
+}
+
+- (UITableViewCell*)signOutButton {
+  if (!_signOutButton) {
+    _signOutButton = [[UITableViewCell alloc] init];
+    _signOutButton.textLabel.text = @"";
+    _signOutButton.backgroundColor = self.menuController.backGroundColor;
+    _signOutButton.textLabel.textColor = [UIColor redColor];
+    _signOutButton.selectedBackgroundView = [[UIView alloc] initWithFrame:_signOutButton.bounds];
+    _signOutButton.selectedBackgroundView.backgroundColor = self.menuController.selectionColor;
+    _signOutButton.imageView.image =[UIImage imageNamed:@"signout_image.png"];
+  }
+  return _signOutButton;
+}
+
+- (UITableViewCell *)extraCell {
+  if (!_extraCell) {
+    _extraCell = [[UITableViewCell alloc] init];
+    _extraCell.selectionStyle = UITableViewCellSelectionStyleNone;
+    _extraCell.backgroundColor = self.menuController.backGroundColor;
+  }
+  return _extraCell;
+}
+
+- (void)didSelectItemAtIndex:(NSInteger)index HBMenuController:(HBMenuController *)HBMenuController {
+  UIViewController *selectedController = [self viewControllerAtIndex:index HBMenuController:HBMenuController];
+  if ([selectedController isKindOfClass:[UINavigationController class]]) {
+    UINavigationController *navController = (UINavigationController *) selectedController;
+    [navController popToRootViewControllerAnimated:YES];
+  } else if (index == self.viewControllersInMenu.count + 1) { // signout button
+    [HBMenuController closeHBMenuWithDuration:HBMenuController.kMaxAnimationTime];
+    [self signOut];
+  }
+}
 
 @end

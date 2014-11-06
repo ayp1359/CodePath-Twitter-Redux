@@ -11,12 +11,13 @@
 
 static NSString * const kTwitterAPIKey = @"KC10IUWkp4ObmCQ0ReAlPB5W1";
 static NSString * const kTwitterAPISecret = @"IhCgHTlixnRrnt8lopcCGvlO3Hgy0lDoWtO7HJoyyKhRSiTxJO";
-static NSString * const kCallbackURLScheme = @"codepathtwitter";
-static NSString * const kCallbackURLHost = @"request_token";
-static NSString * const kAccessTokenKey = @"com.codepath.twitter.access_token";
 
-NSString * const kTwitterClientCallbackNotification = @"com.codepath.twitter.notification.oauth.callback";
-NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notification.oauth.urlkey";
+NSString * const kTwitterClientCallbackNotification = @"twitter.notification.oauth.callback";
+NSString * const kTwitterClientCallbackURLKey = @"twitter.notification.oauth.urlkey";
+static NSString * const kCallbackURLHost = @"request_token";
+static NSString * const kAccessTokenKey = @"twitter.access_token";
+static NSString * const kCallbackURLScheme = @"codepathtwitter";
+
 
 @interface TwitterClient ()
 @property (nonatomic, strong) id applicationLaunchNotificationObserver;
@@ -27,18 +28,15 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
 + (TwitterClient *)instance {
   static dispatch_once_t once;
   static TwitterClient *instance;
-  
   dispatch_once(&once, ^{
     instance = [[TwitterClient alloc] initWithBaseURL:[NSURL URLWithString:@"https://api.twitter.com/"]
                                           consumerKey:kTwitterAPIKey
                                        consumerSecret:kTwitterAPISecret];
   });
-  
   return instance;
 }
 
-- (void)loginWithSuccess:(void (^)())success failure:(void (^)(NSError* error))failure;
-{
+- (void)loginWithSuccess:(void (^)())success failure:(void (^)(NSError* error))failure; {
   [self removeAccessToken];
   [self fetchRequestTokenWithPath:@"oauth/request_token"
                            method:@"POST"
@@ -48,13 +46,11 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
                             [self requestAccessTokenWithRequestToken:requestToken success:success failure:failure];
                           }
                           failure:^(NSError *error) {
-                            NSLog(@"Error: %@", error.localizedDescription);
                             failure(error);
                           }];
 }
 
-- (void)currentUserWithSuccess:(void (^)(User* currentUser))success failure:(void (^)(NSError *error))failure
-{
+- (void)currentUserWithSuccess:(void (^)(User* currentUser))success failure:(void (^)(NSError *error))failure {
   [self GET:@"1.1/account/verify_credentials.json"
  parameters:nil
     success:^(AFHTTPRequestOperation *operation, id response){
@@ -62,28 +58,23 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
       success(currentUser);
     }
     failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-      NSLog(@"%@", error);
       failure(error);
     }];
 }
 
-- (void)userTimeLine:(User *) user success:(void (^)(NSArray *))success failure:(void (^)(NSError *))failure
-{
+- (void)userTimeLine:(User *) user success:(void (^)(NSArray *))success failure:(void (^)(NSError *))failure {
   [self timeline:@"1.1/statuses/user_timeline.json" success:success failure:failure params:@{@"user_id": [NSNumber numberWithInteger:user.userId]}];
 }
 
-- (void)homeTimelineWithSuccess:(void (^)(NSArray *))success failure:(void (^)(NSError *))failure
-{
+- (void)homeTimelineWithSuccess:(void (^)(NSArray *))success failure:(void (^)(NSError *))failure {
   [self timeline:@"1.1/statuses/home_timeline.json" success:success failure:failure params:nil];
 }
 
-- (void)mentionsTimelineWithSuccess:(void (^)(NSArray *))success failure:(void (^)(NSError *))failure
-{
+- (void)mentionsTimelineWithSuccess:(void (^)(NSArray *))success failure:(void (^)(NSError *))failure {
   [self timeline:@"1.1/statuses/mentions_timeline.json" success:success failure:failure params:nil];
 }
 
-- (void)postTweetWithText:(NSString*)text replyToTweetId:(NSNumber*)replyToId success:(void (^)(Tweet* tweet))success failure:(void (^)(NSError *error))failure
-{
+- (void)postTweetWithText:(NSString*)text replyToTweetId:(NSNumber*)replyToId success:(void (^)(Tweet* tweet))success failure:(void (^)(NSError *error))failure {
   NSDictionary *params;
   
   if (replyToId) {
@@ -95,7 +86,6 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
   [self POST:@"1.1/statuses/update.json" parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
     if ([responseObject isKindOfClass:[NSDictionary class]]) {
       NSDictionary *response = (NSDictionary*) responseObject;
-      //            NSLog(@"%@", response);
       Tweet *tweet = [[Tweet alloc] initWithDictionary:response];
       success(tweet);
     } else {
@@ -106,8 +96,7 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
   }];
 }
 
-- (BDBOAuthToken*) accessToken
-{
+- (BDBOAuthToken*) accessToken {
   NSData *data = [[NSUserDefaults standardUserDefaults] dataForKey:kAccessTokenKey];
   if (data) {
     return [NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -115,8 +104,7 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
   return nil;
 }
 
-- (void)saveAccessToken:(BDBOAuthToken *)accessToken
-{
+- (void)saveAccessToken:(BDBOAuthToken *)accessToken {
   [self.requestSerializer saveAccessToken:accessToken];
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   NSData *data = [NSKeyedArchiver archivedDataWithRootObject:accessToken];
@@ -124,16 +112,14 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
   [userDefaults synchronize];
 }
 
-- (void)removeAccessToken
-{
+- (void)removeAccessToken {
   [self.requestSerializer removeAccessToken];
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   [userDefaults removeObjectForKey:kAccessTokenKey];
   [userDefaults synchronize];
 }
 
-- (void)toggleFavoriteForTweet:(Tweet *)tweet success:(void (^)(Tweet *))success failure:(void (^)(NSError *))failure
-{
+- (void)toggleFavoriteForTweet:(Tweet *)tweet success:(void (^)(Tweet *))success failure:(void (^)(NSError *))failure {
   NSString* resource;
   if (tweet.favorited) {
     resource = @"1.1/favorites/destroy.json";
@@ -149,7 +135,6 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
   [self POST:resource parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
     if ([responseObject isKindOfClass:[NSDictionary class]]) {
       NSDictionary *response = (NSDictionary*) responseObject;
-      //            NSLog(@"%@", response);
       Tweet *tweet = [[Tweet alloc] initWithDictionary:response];
       if (success) success(tweet);
     } else {
@@ -160,8 +145,7 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
   }];
 }
 
-- (void) retweet:(Tweet *)tweet success:(void (^)(Tweet *))success failure:(void (^)(NSError *))failure
-{
+- (void) retweet:(Tweet *)tweet success:(void (^)(Tweet *))success failure:(void (^)(NSError *))failure {
   if (tweet.retweeted) {
     if (failure) failure([NSError errorWithDomain:@"Already retweeted." code:400 userInfo:nil]);
   }
@@ -175,7 +159,6 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
   [self POST:retweetResource parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
     if ([responseObject isKindOfClass:[NSDictionary class]]) {
       NSDictionary *response = (NSDictionary*) responseObject;
-      //            NSLog(@"%@", response);
       Tweet *tweet = [[Tweet alloc] initWithDictionary:response];
       if (success) success(tweet);
     } else {
@@ -186,12 +169,10 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
   }];
 }
 
-- (void) unRetweet:(Tweet*) tweet success:(void (^)())success failure:(void (^)(NSError *))failure
-{
+- (void) unRetweet:(Tweet*) tweet success:(void (^)())success failure:(void (^)(NSError *))failure {
   if (!tweet.retweeted) {
     if (failure) failure([NSError errorWithDomain:@"Cannot unretweet" code:400 userInfo:nil]);
   }
-  
   
   tweet.retweeted = NO;
   tweet.retweetCount--;
@@ -212,9 +193,7 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
   }];
 }
 
-#pragma mark - Private methods
-- (void)timeline:(NSString*)resource success:(void (^)(NSArray *))success failure:(void (^)(NSError *))failure params:(NSDictionary *)params
-{
+- (void)timeline:(NSString*)resource success:(void (^)(NSArray *))success failure:(void (^)(NSError *))failure params:(NSDictionary *)params {
   [self GET:resource
  parameters:params
     success:^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -235,8 +214,7 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
     }];
 }
 
-- (void) deleteTweetWithId:(unsigned long long)tweetId success:(void (^)())success failure:(void (^)(NSError *))failure
-{
+- (void) deleteTweetWithId:(unsigned long long)tweetId success:(void (^)())success failure:(void (^)(NSError *))failure {
   NSString *deleteResource = [NSString stringWithFormat:@"1.1/statuses/destroy/%lld.json", tweetId];
   NSDictionary *params = @{@"id": [NSNumber numberWithLongLong:tweetId]};
   [self POST:deleteResource parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject)
@@ -265,8 +243,7 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
 
 - (void) handleApplicationCallbackWithNotification:(NSNotification*)notification
                                            success:(void (^)())success
-                                           failure:(void (^)(NSError* error))failure
-{
+                                           failure:(void (^)(NSError* error))failure {
   NSURL *url = [[notification userInfo] valueForKey:kTwitterClientCallbackURLKey];
   if ([url.scheme isEqualToString:kCallbackURLScheme] && [url.host isEqualToString:kCallbackURLHost])
   {
@@ -282,7 +259,6 @@ NSString * const kTwitterClientCallbackURLKey = @"com.codepath.twitter.notificat
                                success();
                              }
                              failure:^(NSError* error) {
-                               NSLog(@"Error during access token: %@", error.localizedDescription);
                                [[NSNotificationCenter defaultCenter] removeObserver:self.applicationLaunchNotificationObserver];
                                self.applicationLaunchNotificationObserver = nil;
                                failure(error);

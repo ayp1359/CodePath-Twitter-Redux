@@ -11,35 +11,29 @@
 
 
 @interface TweetTableViewController ()
-@property (strong, nonatomic) TweetCell* referenceTweetCell;
+@property (strong, nonatomic) TweetCell* mainTweetCell;
 @end
 
 @implementation TweetTableViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
   }
   return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
   [super viewDidLoad];
   self.tableView.delegate = self;
   self.tableView.dataSource = self;
   
   UINib *tweetCellNib = [UINib nibWithNibName:@"TweetCell" bundle:nil];
-  self.referenceTweetCell = [tweetCellNib instantiateWithOwner:self options:nil][0];
+  self.mainTweetCell = [tweetCellNib instantiateWithOwner:self options:nil][0];
   [self.tableView registerNib:tweetCellNib forCellReuseIdentifier:@"TweetCell"];
 }
 
-
-#pragma mark - UITableViewDelegate and UITableViewDataSource
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
   TweetCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"TweetCell" forIndexPath:indexPath];
   Tweet *tweet = self.delegate.tweets[indexPath.row];
   cell.tweet = tweet;
@@ -47,8 +41,7 @@
   return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
   
 }
 
@@ -57,14 +50,12 @@
   return self.delegate.tweets.count;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
   Tweet* tweet = self.delegate.tweets[indexPath.row];
-  return [self.referenceTweetCell estimateHeight:tweet];
+  return [self.mainTweetCell estimateHeight:tweet];
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning];
 }
 
