@@ -32,7 +32,7 @@ Time spent: 10 hours
 - [ ] Swipe to delete an account
 
 ### Walkthrough
-![Video Walkthrough]()
+![Video Walkthrough](http://i.imgur.com/gG3NVsB.gif)
 
 Credits
 ---------
