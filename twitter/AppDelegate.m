@@ -177,7 +177,7 @@
   if ([selectedController isKindOfClass:[UINavigationController class]]) {
     UINavigationController *navController = (UINavigationController *) selectedController;
     [navController popToRootViewControllerAnimated:YES];
-  } else if (index == self.viewControllersInMenu.count + 1) { // signout button
+  } else if (index == self.viewControllersInMenu.count + 1) {
     [HBMenuController closeHBMenuWithDuration:HBMenuController.kMaxAnimationTime];
     [self signOut];
   }
